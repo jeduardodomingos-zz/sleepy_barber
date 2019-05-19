@@ -3,7 +3,7 @@
 
 # Relative path conversion top directories.
 set(CMAKE_RELATIVE_PATH_TOP_SOURCE "D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber")
-set(CMAKE_RELATIVE_PATH_TOP_BINARY "D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug")
+set(CMAKE_RELATIVE_PATH_TOP_BINARY "D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw")
 
 # Force unix paths in dependencies.
 set(CMAKE_FORCE_UNIX_PATHS 1)

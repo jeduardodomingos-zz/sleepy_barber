@@ -1,0 +1,3 @@
+D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw/CMakeFiles/sleepy_barber.dir
+D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw/CMakeFiles/edit_cache.dir
+D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw/CMakeFiles/rebuild_cache.dir
