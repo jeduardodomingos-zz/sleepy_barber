@@ -31,7 +31,6 @@ typedef struct chair chairStructure;
 typedef struct barber barberStructure;
 typedef struct customer customerStructure;
 
-
 void presentation();
 int getMaxChairNumber();
 int getProcessNumberToEntry();
@@ -40,8 +39,11 @@ int countWaitingCustomers(customerStructure *customers);
 int countAttendCustomers(customerStructure *customers);
 int countAlreadyAttendCustomers(customerStructure *customers);
 int countTotalCustomers(customerStructure *customers);
+int navigationMenu(customerStructure *customers);
 
 int main() {
+    int selectedOption = 0;
+
     chairStructure *availableChairs = NULL;
     barberStructure *availableBarbers = NULL;
     customerStructure *customers = NULL;
@@ -54,6 +56,21 @@ int main() {
     availableChairs = (chairStructure *) malloc(sizeof(chairStructure) * getMaxChairNumber()); //O usuário definirá quantos slots de espera estarão disponíveis
     availableBarbers = (barberStructure *) malloc(sizeof(barberStructure) * 2); //haverão duas threads disponíveis (Simulando os Barbeiros)
 
+    while(selectedOption != 3){
+        selectedOption = navigationMenu(customers);
+
+        switch (selectedOption){
+            case 1:
+                //TODO - Incluir novo Cliente
+                break;
+            case 2:
+                //TODO - Exibir Log de Execucoes
+                break;
+            default:
+                //TODO - Opção Inválida voltar para o inicio
+                break;
+        }
+    }
 
     free(availableChairs);
     free(availableBarbers);
@@ -160,9 +177,7 @@ int countTotalCustomers(customerStructure *customers){
 int navigationMenu(customerStructure *customers){
     int selectedOption = 0;
 
-
-
-    printf("----------------------------- Menu de Navegacao -----------------------------\n\n");
+    printf("-------------------------------------- Menu de Navegacao -----------------------------------\n\n");
     printf((countAttendCustomers(customers) > 0 ? "----------------------------- Existem processos em execucao -----------------------------" : "----------------------------- Nao existem processos em execucao -----------------------------"));
     printf("\n\n1 - Adicionar um novo Cliente a fila");
     printf("\n2 - Exibir status das execucoes atuais");
@@ -170,4 +185,6 @@ int navigationMenu(customerStructure *customers){
     printf("\nR: ");
 
     scanf("%d", &selectedOption);
+
+    return selectedOption;
 }
