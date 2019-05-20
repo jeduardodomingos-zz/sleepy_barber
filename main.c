@@ -65,7 +65,7 @@ int main() {
 void includeCustomer(customerStructure **customers){
     customerStructure newCustomer;
 
-    newCustomer.customerNumber = countTotalCustomers(*customers);
+    newCustomer.customerNumber = countTotalCustomers(*customers) + 1;
     newCustomer.alreadyAttended = 0;
     newCustomer.isAttend = 0;
     newCustomer.isWaiting = 0;
@@ -155,4 +155,19 @@ int countTotalCustomers(customerStructure *customers){
     }
 
     return totalCustomers;
+}
+
+int navigationMenu(customerStructure *customers){
+    int selectedOption = 0;
+
+
+
+    printf("----------------------------- Menu de Navegacao -----------------------------\n\n");
+    printf((countAttendCustomers(customers) > 0 ? "----------------------------- Existem processos em execucao -----------------------------" : "----------------------------- Nao existem processos em execucao -----------------------------"));
+    printf("\n\n1 - Adicionar um novo Cliente a fila");
+    printf("\n2 - Exibir status das execucoes atuais");
+    printf("\n3 - Sair");
+    printf("\nR: ");
+
+    scanf("%d", &selectedOption);
 }
