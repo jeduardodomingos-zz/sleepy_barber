@@ -33,7 +33,7 @@ typedef struct chair chairStructure;
 typedef struct barber barberStructure;
 typedef struct customer customerStructure;
 
-void includeCustomer(customerStructure **customers);
+void includeCustomer(customerStructure **customers, int availableChairs);
 void presentation();
 int setMaxChairNumber(int *chairs);
 int countWaitingCustomers(customerStructure *customers);
@@ -68,7 +68,7 @@ int main() {
 
         switch (selectedOption){
             case 1:
-                includeCustomer(&customers);
+                includeCustomer(&customers, availableChairNumber);
                 break;
             case 2:
                 operationResume(customers);
@@ -99,7 +99,8 @@ void includeCustomer(customerStructure **customers, int availableChairs){
     newCustomer.isWaiting = 0;
 
     if(countWaitingCustomers(*customers) >= availableChairs){
-        
+        writeInLogFile("NAO POSSUIA SLOTS DE ESPERA DISPONIVEIS, O MESMO SE RETIROU SEM SER PROCESSADO", newCustomer.customerNumber);
+        return;
     }
 
     if((*customers) == NULL){
@@ -230,6 +231,8 @@ void *processCustomer(void *args){
                     continue;
                 }
             }
+        }else{
+            writeInLogFile("BARBEIRO OSCIOSO - DORMINDO", 0);
         }
     }
 }
