@@ -25,7 +25,7 @@ struct customer {
     int customerNumber;
     int isWaiting;
     int isAttend;
-    int alreadyAttended
+    int alreadyAttended;
 };
 
 
@@ -218,6 +218,8 @@ void writeInLogFile(char operation[200], int customerNumber){
 
 void *processCustomer(void *args){
     customerStructure *customers = (customerStructure*) args;
+
+    printf("\n\nThread de processamento executando\n\n");
 
     if(customers != NULL){
         if(countWaitingCustomers(customers) > 0){

@@ -311,3 +311,19 @@ mingw32-make.exe[1]: Leaving directory 'D:/Projetos/Unifaj/Sistemas Operacionais
     Feature record: C_FEATURE:0c_restrict
     Feature record: C_FEATURE:0c_static_assert
     Feature record: C_FEATURE:0c_variadic_macros
+Determining if the include file pthread.h exists passed with the following output:
+Change Dir: D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/MinGW/bin/mingw32-make.exe cmTC_af49d/fast 
+C:/MinGW/bin/mingw32-make.exe -f CMakeFiles\cmTC_af49d.dir\build.make CMakeFiles/cmTC_af49d.dir/build
+mingw32-make.exe[1]: Entering directory 'D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_af49d.dir/CheckIncludeFile.c.obj
+C:\MinGW\bin\gcc.exe   -std=gnu99 -o CMakeFiles\cmTC_af49d.dir\CheckIncludeFile.c.obj   -c "D:\Projetos\Unifaj\Sistemas Operacionais\sleepy_barber\cmake-build-debug-mingw\CMakeFiles\CMakeTmp\CheckIncludeFile.c"
+Linking C executable cmTC_af49d.exe
+"C:\Program Files\JetBrains\CLion 2019.1.2\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_af49d.dir\link.txt --verbose=1
+"C:\Program Files\JetBrains\CLion 2019.1.2\bin\cmake\win\bin\cmake.exe" -E remove -f CMakeFiles\cmTC_af49d.dir/objects.a
+C:\MinGW\bin\ar.exe cr CMakeFiles\cmTC_af49d.dir/objects.a @CMakeFiles\cmTC_af49d.dir\objects1.rsp
+C:\MinGW\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_af49d.dir/objects.a -Wl,--no-whole-archive  -o cmTC_af49d.exe -Wl,--out-implib,libcmTC_af49d.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_af49d.dir\linklibs.rsp
+mingw32-make.exe[1]: Leaving directory 'D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/cmake-build-debug-mingw/CMakeFiles/CMakeTmp'
+
+
