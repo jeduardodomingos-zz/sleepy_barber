@@ -4,46 +4,13 @@
 #include <Windows.h>
 #include <pthread.h>
 #include <time.h>
+#include "main.h"
 
 #define DEFAULT_PAUSE 1
 #define ATTEND_PAUSE 2
 #define MILLISECOND 1000
 
 //Para as variáveis inteiras utilizadas como booleanas, consideremos 1 para TRUE e 0 para FALSE
-
-struct chair {
-    int chairNumber;
-    int isBusy;
-};
-
-struct barber {
-    int barberNumber;
-    int isBusy;
-};
-
-struct customer {
-    int customerNumber;
-    int isWaiting;
-    int isAttend;
-    int alreadyAttended;
-};
-
-
-typedef struct chair chairStructure;
-typedef struct barber barberStructure;
-typedef struct customer customerStructure;
-
-void includeCustomer(customerStructure **customers, int availableChairs);
-void presentation();
-int setMaxChairNumber(int *chairs);
-int countWaitingCustomers(customerStructure *customers);
-int countAttendCustomers(customerStructure *customers);
-int countAlreadyAttendCustomers(customerStructure *customers);
-int countTotalCustomers(customerStructure *customers);
-int navigationMenu(customerStructure *customers);
-void writeInLogFile(char operation[200], int customerNumber);
-void * processCustomer(void *args);
-void operationResume(customerStructure *customers);
 
 int main() {
     int selectedOption = 0;
@@ -57,8 +24,8 @@ int main() {
     presentation();
     setMaxChairNumber(&availableChairNumber); //O usuário definirá quantos slots de espera estarão disponíveis
 
-    pthread_create(&threadOne, NULL, processCustomer, (void*) customers);
-    pthread_create(&threadTwo, NULL, processCustomer, (void*) customers);
+    pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
+    pthread_create(&threadTwo, NULL, processCustomer, (void*) &customers);
 
     pthread_join(threadOne, NULL);
     pthread_join(threadTwo, NULL);
@@ -68,7 +35,7 @@ int main() {
 
         switch (selectedOption){
             case 1:
-                includeCustomer(&customers, availableChairNumber);
+                includeCustomer(&customers, createCustomer(),availableChairNumber);
                 break;
             case 2:
                 operationResume(customers);
@@ -85,32 +52,63 @@ int main() {
         }
     }
 
+    pthread_kill(threadOne, 1);
+    pthread_kill(threadTwo, 1);
+
     free(customers);
 
     return 0;
 }
 
-void includeCustomer(customerStructure **customers, int availableChairs){
-    customerStructure newCustomer;
+customerStructure* createCustomer(){
+    customerStructure *newCustomer;
 
-    newCustomer.customerNumber = countTotalCustomers(*customers) + 1;
-    newCustomer.alreadyAttended = 0;
-    newCustomer.isAttend = 0;
-    newCustomer.isWaiting = 0;
+    newCustomer = (customerStructure*) malloc(sizeof(customerStructure));
 
-    if(countWaitingCustomers(*customers) >= availableChairs){
-        writeInLogFile("NAO POSSUIA SLOTS DE ESPERA DISPONIVEIS, O MESMO SE RETIROU SEM SER PROCESSADO", newCustomer.customerNumber);
-        return;
-    }
+    newCustomer->customerNumber =  1;
+    newCustomer->alreadyAttended = 0;
+    newCustomer->isAttend = 0;
+    newCustomer->isWaiting = 0;
+    newCustomer->next = NULL;
 
-    if((*customers) == NULL){
-        *customers = malloc(sizeof(customerStructure));
-    }else{
-        *customers = realloc(customers, sizeof(*customers) + sizeof(customerStructure));
-    }
-
-    *customers[(sizeof(*customers) / sizeof(customerStructure)) - 1] = newCustomer;
+    return newCustomer;
 }
+
+int emptyCustomerList(customerStructure **customers){
+    if((*customers) == NULL){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+void includeCustomer(customerStructure **customers, customerStructure *newCustomer, int availableChairs){
+
+    customerStructure *auxCustomer = (*customers);
+
+    if(countWaitingCustomers(&auxCustomer) >= availableChairs){
+        writeInLogFile("NAO POSSUIA SLOTS DE ESPERA DISPONIVEIS, O MESMO SE RETIROU SEM SER PROCESSADO", newCustomer->customerNumber);
+        return;
+    }else{
+        if(emptyCustomerList(&auxCustomer) == 1){
+            *customers = newCustomer;
+        }else{
+            if(auxCustomer->next == NULL){
+                auxCustomer->next = newCustomer;
+                (*customers) = auxCustomer;
+            }else{
+                while(auxCustomer->next != NULL){
+                    auxCustomer = auxCustomer->next;
+                }
+
+                auxCustomer->next = newCustomer;
+
+                (*customers) = auxCustomer;
+            }
+        }
+    }
+}
+
 
 void presentation() {
     system("cls");
@@ -129,47 +127,98 @@ int setMaxChairNumber(int *chairs) {
     scanf("%d", chairs);
 }
 
-int countWaitingCustomers(customerStructure *customers) {
+int countWaitingCustomers(customerStructure **customers) {
+    customerStructure *auxCustomers;
     int waitingCustomers = 0;
 
-    for (int i = 0; i < (sizeof(customers) / sizeof(customerStructure)); i++) {
-        if (customers[i].isWaiting) {
-            waitingCustomers++;
+    if(customers == NULL){
+        auxCustomers = NULL;
+    }else{
+        auxCustomers = (*customers);
+    }
+
+    if(emptyCustomerList(customers) == 1){
+        return waitingCustomers;
+    }else{
+        while(auxCustomers != NULL){
+            if(auxCustomers->isWaiting == 1){
+                waitingCustomers++;
+            }
+
+            auxCustomers = auxCustomers->next;
         }
     }
 
     return waitingCustomers;
 }
 
-int countAttendCustomers(customerStructure *customers){
+int countAttendCustomers(customerStructure **customers){
+    customerStructure *auxCustomers;
     int attendCustomers = 0;
 
-    for (int i = 0; i < (sizeof(customers) / sizeof(customerStructure)); i++) {
-        if (customers[i].isAttend) {
-            attendCustomers++;
+    if(customers == NULL){
+        auxCustomers = NULL;
+    }else{
+        auxCustomers = (*customers);
+    }
+
+    if(emptyCustomerList(customers) == 1){
+        return attendCustomers;
+    }else{
+        while(auxCustomers != NULL){
+            if(auxCustomers->isAttend == 1){
+                attendCustomers++;
+            }
+
+            auxCustomers = auxCustomers->next;
         }
     }
 
     return attendCustomers;
 }
 
-int countAlreadyAttendCustomers(customerStructure *customers){
+int countAlreadyAttendCustomers(customerStructure **customers){
+    customerStructure *auxCustomers;
     int alreadyAttendCustomers = 0;
 
-    for (int i = 0; i < (sizeof(customers) / sizeof(customerStructure)); i++) {
-        if (customers[i].alreadyAttended) {
-            alreadyAttendCustomers++;
+    if(customers == NULL){
+        auxCustomers = NULL;
+    }else{
+        auxCustomers = (*customers);
+    }
+
+    if(emptyCustomerList(customers) == 1){
+        return alreadyAttendCustomers;
+    }else{
+        while(auxCustomers != NULL){
+            if(auxCustomers->alreadyAttended == 1){
+                alreadyAttendCustomers++;
+            }
+
+            auxCustomers = auxCustomers->next;
         }
     }
 
     return alreadyAttendCustomers;
 }
 
-int countTotalCustomers(customerStructure *customers){
+int countTotalCustomers(customerStructure **customers){
+    customerStructure *auxCustomers;
     int totalCustomers = 0;
 
-    for (int i = 0; i < (sizeof(customers) / sizeof(customerStructure)); i++) {
-        totalCustomers++;
+    if(customers == NULL){
+        auxCustomers = NULL;
+    }else{
+        auxCustomers = (*customers);
+    }
+
+    if(emptyCustomerList(customers) == 1){
+        return totalCustomers;
+    }else{
+        while(auxCustomers != NULL){
+            totalCustomers++;
+            auxCustomers = auxCustomers->next;
+        }
     }
 
     return totalCustomers;
@@ -197,7 +246,7 @@ void writeInLogFile(char operation[200], int customerNumber){
 
     itoa(customerNumber, customer, sizeof(customer) * 2);
 
-    archiveReference = fopen("c:/log/sleepy_barber.log", "w");
+    archiveReference = fopen("c:\\log\\sleepy_barber.log", "w");
 
     if(archiveReference == NULL){
         printf("\n\nErro ao realizar abertura do arquivo para escrita.");
@@ -217,24 +266,35 @@ void writeInLogFile(char operation[200], int customerNumber){
 }
 
 void *processCustomer(void *args){
-    customerStructure *customers = (customerStructure*) args;
+    customerStructure **customers = (customerStructure**) args;
+
+    customerStructure *auxCustomer = (*customers);
 
     printf("\n\nThread de processamento executando\n\n");
 
-    if(customers != NULL){
-        if(countWaitingCustomers(customers) > 0){
-            for(int i = 0; i < (sizeof(customers) / sizeof(customerStructure)); i++){
-                if(customers[i].alreadyAttended != 1){
-                    customers[i].isAttend = 1;
-                    customers[i].isWaiting = 0;
-                    writeInLogFile("EM ATENDIMENTO", customers[i].customerNumber);
-                    Sleep(ATTEND_PAUSE * MILLISECOND);
-                }else{
-                    continue;
-                }
-            }
-        }else{
+    while(auxCustomer != NULL){
+
+        if(countWaitingCustomers(customers) == 0 && countAttendCustomers(customers) == 0){
             writeInLogFile("BARBEIRO OSCIOSO - DORMINDO", 0);
+            auxCustomer = (*customers);
+            continue;
+        }
+
+        if(auxCustomer->alreadyAttended != 1) {
+            if (auxCustomer->isAttend != 1) {
+                auxCustomer->isAttend = 1;
+                auxCustomer->isWaiting = 0;
+                writeInLogFile("EM ATENDIMENTO", auxCustomer->customerNumber);
+                Sleep(ATTEND_PAUSE * MILLISECOND);
+                auxCustomer->isAttend = 0;
+                auxCustomer->alreadyAttended = 1;
+            }
+
+            auxCustomer = auxCustomer->next;
+
+            if (auxCustomer == NULL) {
+                auxCustomer = (*customers);
+            }
         }
     }
 }

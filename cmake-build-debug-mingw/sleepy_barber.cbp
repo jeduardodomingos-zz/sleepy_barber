@@ -77,6 +77,9 @@
 		<Unit filename="D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/main.c">
 			<Option target="sleepy_barber"/>
 		</Unit>
+		<Unit filename="D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/main.h">
+			<Option target="sleepy_barber"/>
+		</Unit>
 		<Unit filename="D:/Projetos/Unifaj/Sistemas Operacionais/sleepy_barber/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
