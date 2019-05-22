@@ -137,7 +137,7 @@ int countWaitingCustomers(customerStructure **customers) {
         auxCustomers = (*customers);
     }
 
-    if(emptyCustomerList(customers) == 1){
+    if(emptyCustomerList(&auxCustomers) == 1){
         return waitingCustomers;
     }else{
         while(auxCustomers != NULL){
@@ -162,7 +162,7 @@ int countAttendCustomers(customerStructure **customers){
         auxCustomers = (*customers);
     }
 
-    if(emptyCustomerList(customers) == 1){
+    if(emptyCustomerList(&auxCustomers) == 1){
         return attendCustomers;
     }else{
         while(auxCustomers != NULL){
@@ -187,7 +187,7 @@ int countAlreadyAttendCustomers(customerStructure **customers){
         auxCustomers = (*customers);
     }
 
-    if(emptyCustomerList(customers) == 1){
+    if(emptyCustomerList(&auxCustomers) == 1){
         return alreadyAttendCustomers;
     }else{
         while(auxCustomers != NULL){
@@ -212,7 +212,8 @@ int countTotalCustomers(customerStructure **customers){
         auxCustomers = (*customers);
     }
 
-    if(emptyCustomerList(customers) == 1){
+
+    if(emptyCustomerList(&auxCustomers) == 1){
         return totalCustomers;
     }else{
         while(auxCustomers != NULL){
@@ -228,7 +229,7 @@ int navigationMenu(customerStructure *customers){
     int selectedOption = 0;
 
     printf("-------------------------------------- Menu de Navegacao -----------------------------------\n\n");
-    printf((countAttendCustomers(customers) > 0 ? "----------------------------- Existem processos em execucao -----------------------------" : "----------------------------- Nao existem processos em execucao -----------------------------"));
+    printf((countAttendCustomers(&customers) > 0 ? "----------------------------- Existem processos em execucao -----------------------------" : "----------------------------- Nao existem processos em execucao -----------------------------"));
     printf("\n\n1 - Adicionar um novo Cliente a fila");
     printf("\n2 - Exibir status das execucoes atuais");
     printf("\n3 - Sair");
@@ -302,9 +303,9 @@ void *processCustomer(void *args){
 void operationResume(customerStructure *customers){
     system("cls");
     printf("\n\n------------------------- Resumo da operação -------------------------\n\n");
-    printf("Processos aguardando: %d\n", countWaitingCustomers(customers));
-    printf("\nProcessos em atendimento: %d\n", countAttendCustomers(customers));
-    printf("\nProcessos finalizados: %d\n", countAlreadyAttendCustomers(customers));
+    printf("Processos aguardando: %d\n", countWaitingCustomers(&customers));
+    printf("\nProcessos em atendimento: %d\n", countAttendCustomers(&customers));
+    printf("\nProcessos finalizados: %d\n", countAlreadyAttendCustomers(&customers));
     Sleep(DEFAULT_PAUSE * MILLISECOND);
     system("cls");
 }
