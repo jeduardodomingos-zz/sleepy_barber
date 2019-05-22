@@ -17,7 +17,7 @@ typedef struct customer customerStructure;
 typedef struct customer* pCustomerStructure;
 
 /*Especial return Types*/
-customerStructure* createCustomer();
+customerStructure* createCustomer(customerStructure **customers);
 
 /*Int return Types*/
 int emptyCustomerList(customerStructure **customers);
@@ -30,6 +30,7 @@ int navigationMenu(customerStructure *customers);
 
 /*Without return types*/
 void writeInLogFile(char operation[200], int customerNumber);
+void initializeSessionLog();
 void *processCustomer(void *args);
 void operationResume(customerStructure *customers);
 void includeCustomer(customerStructure **customers, customerStructure *newCustomer, int availableChairs);

@@ -15,6 +15,7 @@
 int main() {
     int selectedOption = 0;
     int availableChairNumber = 0;
+    int startedProcessManager = 0;
 
     customerStructure *customers = NULL;
 
@@ -22,6 +23,7 @@ int main() {
     pthread_t threadTwo;
 
     presentation();
+    initializeSessionLog();
     setMaxChairNumber(&availableChairNumber); //O usuário definirá quantos slots de espera estarão disponíveis
 
     pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
@@ -33,17 +35,20 @@ int main() {
     while(selectedOption != 3){
         selectedOption = navigationMenu(customers);
 
+        system("cls");
+
         switch (selectedOption){
             case 1:
-                includeCustomer(&customers, createCustomer(),availableChairNumber);
+                includeCustomer(&customers, createCustomer(&customers),availableChairNumber);
                 break;
             case 2:
                 operationResume(customers);
                 break;
             case 3:
                 system("cls");
-                printf("A execução do sistema está sendo finalizada");
+                printf("A execuca do sistema esta sendo finalizada");
                 Sleep(DEFAULT_PAUSE * MILLISECOND);
+                break;
             default:
                 system("cls");
                 printf("Opcao invalida ...");
@@ -60,15 +65,15 @@ int main() {
     return 0;
 }
 
-customerStructure* createCustomer(){
+customerStructure* createCustomer(customerStructure **customers){
     customerStructure *newCustomer;
 
     newCustomer = (customerStructure*) malloc(sizeof(customerStructure));
 
-    newCustomer->customerNumber =  1;
+    newCustomer->customerNumber =  countTotalCustomers(customers) + 1;
     newCustomer->alreadyAttended = 0;
     newCustomer->isAttend = 0;
-    newCustomer->isWaiting = 0;
+    newCustomer->isWaiting = 1;
     newCustomer->next = NULL;
 
     return newCustomer;
@@ -103,7 +108,7 @@ void includeCustomer(customerStructure **customers, customerStructure *newCustom
 
                 auxCustomer->next = newCustomer;
 
-                (*customers) = auxCustomer;
+              //  (*customers) = auxCustomer;
             }
         }
     }
@@ -247,7 +252,7 @@ void writeInLogFile(char operation[200], int customerNumber){
 
     itoa(customerNumber, customer, sizeof(customer) * 2);
 
-    archiveReference = fopen("c:\\log\\sleepy_barber.log", "w");
+    archiveReference = fopen("c:\\log\\sleepy_barber.log", "a");
 
     if(archiveReference == NULL){
         printf("\n\nErro ao realizar abertura do arquivo para escrita.");
@@ -258,10 +263,21 @@ void writeInLogFile(char operation[200], int customerNumber){
     strcat(message, " ");
     strcat(message, "Cliente de Numero: ");
     strcat(message, customer);
+    strcat(message, " ");
     strcat(message, operation);
     strcat(message, "\n");
 
     fprintf(archiveReference, "%s", message);
+
+    fclose(archiveReference);
+}
+
+void initializeSessionLog(){
+    FILE *archiveReference;
+
+    archiveReference = fopen("C:\\log\\sleepy_barber.log", "a");
+
+    fprintf(archiveReference, "%s","\n\n########################################################## Log de Nova Execução ##########################################################\n\n");
 
     fclose(archiveReference);
 }
