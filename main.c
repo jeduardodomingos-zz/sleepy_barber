@@ -7,7 +7,7 @@
 #include "main.h"
 
 #define DEFAULT_PAUSE 1
-#define ATTEND_PAUSE 2
+#define ATTEND_PAUSE 1
 #define MILLISECOND 1000
 
 //Para as variáveis inteiras utilizadas como booleanas, consideremos 1 para TRUE e 0 para FALSE
@@ -15,27 +15,36 @@
 int main() {
     int selectedOption = 0;
     int availableChairNumber = 0;
-    int startedProcessManager = 0;
+    int finishedThread = 0;
 
     customerStructure *customers = NULL;
 
     pthread_t threadOne;
-    pthread_t threadTwo;
 
     presentation();
     initializeSessionLog();
     setMaxChairNumber(&availableChairNumber); //O usuário definirá quantos slots de espera estarão disponíveis
 
     pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
-    pthread_create(&threadTwo, NULL, processCustomer, (void*) &customers);
-
-    pthread_join(threadOne, NULL);
-    pthread_join(threadTwo, NULL);
+    pthread_join(threadOne, (void*)&finishedThread);
 
     while(selectedOption != 3){
         selectedOption = navigationMenu(customers);
 
         system("cls");
+
+        if(finishedThread == 0){
+            finishedThread = 999999999;
+            pthread_kill(threadOne, 1);
+            pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
+            pthread_join(threadOne, (void*)&finishedThread);
+        }else if(finishedThread != 999999999){
+            finishedThread = 999999999;
+            pthread_kill(threadOne, 1);
+            pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
+            pthread_join(threadOne, (void*)&finishedThread);
+            writeInLogFile("ERRO AO EXECUTAR THREAD PROCESSO REINICIADO", 0);
+        }
 
         switch (selectedOption){
             case 1:
@@ -56,9 +65,6 @@ int main() {
                 break;
         }
     }
-
-    pthread_kill(threadOne, 1);
-    pthread_kill(threadTwo, 1);
 
     free(customers);
 
@@ -108,7 +114,6 @@ void includeCustomer(customerStructure **customers, customerStructure *newCustom
 
                 auxCustomer->next = newCustomer;
 
-              //  (*customers) = auxCustomer;
             }
         }
     }
@@ -287,24 +292,21 @@ void *processCustomer(void *args){
 
     customerStructure *auxCustomer = (*customers);
 
-    printf("\n\nThread de processamento executando\n\n");
-
-    while(auxCustomer != NULL){
-
-        if(countWaitingCustomers(customers) == 0 && countAttendCustomers(customers) == 0){
-            writeInLogFile("BARBEIRO OSCIOSO - DORMINDO", 0);
-            auxCustomer = (*customers);
-            continue;
-        }
-
-        if(auxCustomer->alreadyAttended != 1) {
-            if (auxCustomer->isAttend != 1) {
-                auxCustomer->isAttend = 1;
-                auxCustomer->isWaiting = 0;
-                writeInLogFile("EM ATENDIMENTO", auxCustomer->customerNumber);
-                Sleep(ATTEND_PAUSE * MILLISECOND);
-                auxCustomer->isAttend = 0;
-                auxCustomer->alreadyAttended = 1;
+    if(countWaitingCustomers(&auxCustomer) == 0 && countAttendCustomers(&auxCustomer) == 0){
+        writeInLogFile("BARBEIRO OSCIOSO - DORMINDO", 0);
+        auxCustomer = (*customers);
+    }else{
+        while(countWaitingCustomers(&auxCustomer) > 0){
+            if(auxCustomer->alreadyAttended != 1) {
+                if (auxCustomer->isAttend != 1) {
+                    auxCustomer->isAttend = 1;
+                    auxCustomer->isWaiting = 0;
+                    writeInLogFile("EM ATENDIMENTO", auxCustomer->customerNumber);
+                    Sleep(ATTEND_PAUSE * MILLISECOND);
+                    auxCustomer->isAttend = 0;
+                    auxCustomer->alreadyAttended = 1;
+                    writeInLogFile("CONCLUIDO", auxCustomer->customerNumber);
+                }
             }
 
             auxCustomer = auxCustomer->next;
@@ -314,6 +316,8 @@ void *processCustomer(void *args){
             }
         }
     }
+
+
 }
 
 void operationResume(customerStructure *customers){
