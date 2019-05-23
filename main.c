@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <Windows.h>
 #include <pthread.h>
 #include <time.h>
@@ -33,17 +34,11 @@ int main() {
 
         system("cls");
 
-        if(finishedThread == 0){
+        if(finishedThread == 0 || finishedThread != 999999999) {
             finishedThread = 999999999;
-            pthread_kill(threadOne, 1);
-            pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
-            pthread_join(threadOne, (void*)&finishedThread);
-        }else if(finishedThread != 999999999){
-            finishedThread = 999999999;
-            pthread_kill(threadOne, 1);
-            pthread_create(&threadOne, NULL, processCustomer, (void*) &customers);
-            pthread_join(threadOne, (void*)&finishedThread);
-            writeInLogFile("ERRO AO EXECUTAR THREAD PROCESSO REINICIADO", 0);
+            pthread_kill(threadOne, 0);
+            pthread_create(&threadOne, NULL, processCustomer, (void *) &customers);
+            pthread_join(threadOne, (void *) &finishedThread);
         }
 
         switch (selectedOption){
@@ -55,7 +50,7 @@ int main() {
                 break;
             case 3:
                 system("cls");
-                printf("A execuca do sistema esta sendo finalizada");
+                printf("A execucao do sistema esta sendo finalizada");
                 Sleep(DEFAULT_PAUSE * MILLISECOND);
                 break;
             default:
